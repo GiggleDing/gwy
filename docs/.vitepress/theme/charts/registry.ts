@@ -138,8 +138,8 @@ export const charts: Record<string, ChartDef> = {
   'paper-structure': {
     height: '340px',
     caption:
-      '柱为题量与建议用时（左轴），折线为目标正确率（右轴）。数量关系不设正确率目标（只做 3–5 题、其余统一蒙），故折线在此断开；涂卡 2 分钟未计入。',
-    aria: '副省级卷六个模块的题量、建议用时与目标正确率',
+      '柱为题量与建议用时（左轴），折线为目标正确率（右轴）。数量关系只做 3–5 题、其余统一蒙，没有可冲的目标，折线上用空心点标出的是估算值：做对 3 题、12 题统一蒙（四分之一命中）约 40%；若做对 5 题则约 50%。涂卡 2 分钟未计入。',
+    aria: '副省级卷六个模块的题量、建议用时与目标正确率。政治理论 80%、常识判断 55%、言语理解 75%、数量关系约 40%（估算）、判断推理 75%、资料分析 85%',
     build: (p) => ({
       tooltip: tooltip(p),
       legend: legend(p),
@@ -182,17 +182,32 @@ export const charts: Record<string, ChartDef> = {
           type: 'line',
           yAxisIndex: 1,
           smooth: true,
-          connectNulls: false,
           symbolSize: 7,
           lineStyle: { width: 2.2, color: p.series[5] },
           itemStyle: { color: p.series[5] },
           label: {
             show: true,
+            position: 'top',
+            distance: 6,
             color: p.text,
             fontSize: 11,
-            formatter: (x: { value: number | null }) => (x.value == null ? '' : x.value + '%'),
+            formatter: (x: { value: number }) => x.value + '%',
           },
-          data: [80, 55, 75, null, 75, 85],
+          data: [
+            { value: 80 },
+            { value: 55 },
+            { value: 75 },
+            {
+              // 数量关系没有「目标」，只有按「做对 3 题 + 12 题统一蒙」估出来的期望值。
+              // 用空心点把它和其余实心「目标」点区分开，标签也加「约」。
+              value: 40,
+              symbol: 'emptyCircle',
+              symbolSize: 9,
+              label: { show: true, formatter: '约 40%', color: p.text },
+            },
+            { value: 75 },
+            { value: 85 },
+          ],
         },
       ],
     }),
@@ -341,7 +356,7 @@ export const charts: Record<string, ChartDef> = {
   'cs-accuracy-compare': {
     height: '290px',
     caption:
-      '常识判断是六个模块里目标正确率最低的一个。把整块时间投给常识，等于用最贵的资源去填最浅的坑。',
+      '只列设了正确率目标的五个模块——数量关系不设目标（只做 3–5 题、其余统一蒙），不参与比较。常识判断是这五个里最低的一个：把整块时间投给常识，等于用最贵的资源去填最浅的坑。',
     aria: '目标正确率对比：资料分析 85%、政治理论 80%、言语理解 75%、判断推理 75%、常识判断 55%',
     build: (p) => {
       const rows: [string, number][] = [
