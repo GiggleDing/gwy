@@ -214,7 +214,6 @@ export const charts: Record<string, ChartDef> = {
   },
 
   /* ───────────────── 00-总览 / 行测战略地图 ───────────────── */
-
   /** 题量分布（占比） */
   'module-share': {
     height: '330px',
@@ -872,6 +871,211 @@ export const charts: Record<string, ChartDef> = {
               color: p.text,
               fontSize: 11.5,
               formatter: (x: { dataIndex: number }) => rows[x.dataIndex].desc,
+            },
+          },
+        ],
+      }
+    },
+  },
+  /* ───────────────── 09-套卷记录 ───────────────── */
+
+  /** 历次套卷行测折合分 + 三层目标线 */
+  'paper-score-trend': {
+    height: '330px',
+    caption:
+      '目前只有一套实测，柱子会随着每次套卷长出来。估分 70.8 里含数量关系蒙对的运气（多拿 2.2 题），扣掉后约 68——正卡在达标线上。',
+    aria: '历次套卷行测折合分：2026-09-19 首考估分 70.8、校正后约 68；三层目标为保底 62、达标 68、冲刺 73',
+    build: (p) => ({
+      tooltip: tooltip(p),
+      legend: legend(p),
+      grid: grid({ top: 52, right: 34 }),
+      xAxis: catAxis(['09-19 首考'], p, {
+        axisLabel: { color: p.sub, fontSize: 12, interval: 0 },
+      }),
+      yAxis: valAxis(p, { name: '行测折合分', nameTextStyle: axisName(p), max: 80 }),
+      series: [
+        {
+          name: '估分（含运气）',
+          type: 'bar',
+          barWidth: 42,
+          itemStyle: { color: p.series[0] },
+          label: { show: true, position: 'top', color: p.text, fontSize: 12.5 },
+          data: [70.8],
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            data: [
+              {
+                yAxis: 73,
+                name: '冲刺',
+                lineStyle: { type: 'dashed', color: p.series[5], width: 1.2 },
+                label: { formatter: '冲刺 73', position: 'insideEndTop', color: p.series[5], fontSize: 11 },
+              },
+              {
+                yAxis: 68,
+                name: '达标',
+                lineStyle: { type: 'dashed', color: p.series[1], width: 1.2 },
+                label: { formatter: '达标 68', position: 'insideEndTop', color: p.series[1], fontSize: 11 },
+              },
+              {
+                yAxis: 62,
+                name: '保底',
+                lineStyle: { type: 'dashed', color: p.series[3], width: 1.2 },
+                label: { formatter: '保底 62', position: 'insideEndTop', color: p.series[3], fontSize: 11 },
+              },
+            ],
+          },
+        },
+        {
+          name: '校正后（扣蒙题运气）',
+          type: 'bar',
+          barWidth: 42,
+          itemStyle: { color: p.series[4] },
+          label: { show: true, position: 'top', color: p.text, fontSize: 12.5 },
+          data: [68],
+        },
+      ],
+    }),
+  },
+
+  /** 模块相对大盘的差值：比绝对正确率更有用，它把「这套卷难不难」扣掉了 */
+  'paper-module-diff': {
+    height: '330px',
+    caption:
+      '差值 = 我的正确率 − 题库同题平均正确率。言语 +19.3、资料 +30.8 是真优势；判断推理 −2.1 是全卷唯一跑输大盘的模块。数量关系不参与——全蒙的差值没有意义。',
+    aria: '模块相对题库平均的差值：资料分析 +30.8、言语理解 +19.3、政治理论 +5.8、常识判断 +4.5、判断推理 −2.1',
+    build: (p) => {
+      const rows: [string, number, string][] = [
+        ['资料分析', 30.8, '100.0% vs 69.2%'],
+        ['言语理解', 19.3, '86.7% vs 67.4%'],
+        ['政治理论', 5.8, '60.0% vs 54.2%'],
+        ['常识判断', 4.5, '40.0% vs 35.5%'],
+        ['判断推理', -2.1, '68.6% vs 70.7%'],
+      ]
+      return {
+        tooltip: {
+          ...tooltipItem(p),
+          formatter: (x: { dataIndex: number }) => {
+            const [n, d, cmp] = rows[x.dataIndex]
+            return `<b>${n}</b><br/>${cmp}<br/>差值 ${d > 0 ? '+' : ''}${d}`
+          },
+        },
+        grid: grid({ left: 4, right: 44, top: 18, bottom: 26 }),
+        xAxis: valAxis(p, {
+          name: '相对大盘（百分点）',
+          nameTextStyle: axisName(p),
+          nameLocation: 'middle',
+          nameGap: 26,
+          min: -10,
+          max: 36,
+        }),
+        yAxis: catAxis(
+          rows.map((r) => r[0]),
+          p,
+          { inverse: true, axisLabel: { color: p.text, fontSize: 12 } },
+        ),
+        series: [
+          {
+            type: 'bar',
+            barWidth: 17,
+            data: rows.map(([n, d]) => ({
+              value: d,
+              name: n,
+              // 负值＝跑输大盘，用品牌红提出来；正值用中性蓝灰
+              itemStyle: { color: d < 0 ? p.series[0] : p.series[4], borderRadius: 3 },
+              // 负值的条朝左长，标签放右侧会压在零线上，所以逐条指定方向
+              label: {
+                show: true,
+                position: d < 0 ? 'left' : 'right',
+                distance: 8,
+                color: p.text,
+                fontSize: 11.5,
+                formatter: `${d > 0 ? '+' : ''}${d}`,
+              },
+            })),
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              lineStyle: { color: p.axis, width: 1.2 },
+              label: { show: false },
+              data: [{ xAxis: 0 }],
+            },
+          },
+        ],
+      }
+    },
+  },
+
+  /** 时间账：相对预算的偏差。右边＝超支，左边＝倒挂（被挤空） */
+  'paper-time-account': {
+    height: '340px',
+    caption:
+      '预算按副省级建议配速（非官方）。红条是真正出问题的三处：资料 +5.8′、判断 +3.0′、数量 −8.9′。合计超支 8.8 分钟，代价是数量关系整块被挤空——它是症状，不是病。',
+    aria: '各模块用时相对预算的偏差：资料分析 +5.8 分钟、判断推理 +3.0 分钟、言语理解 +0.4 分钟、政治理论 +0.2 分钟、常识判断 −0.5 分钟、数量关系 −8.9 分钟',
+    build: (p) => {
+      const rows: { name: string; bud: number; act: number }[] = [
+        { name: '资料分析', bud: 25, act: 30.8 },
+        { name: '判断推理', bud: 35, act: 38.0 },
+        { name: '言语理解', bud: 32, act: 32.4 },
+        { name: '政治理论', bud: 10, act: 10.2 },
+        { name: '常识判断', bud: 8, act: 7.5 },
+        { name: '数量关系', bud: 10, act: 1.1 },
+      ]
+      const data = rows
+        .map((r) => ({ ...r, d: +(r.act - r.bud).toFixed(1) }))
+        .sort((a, b) => Math.abs(b.d) - Math.abs(a.d))
+      return {
+        tooltip: {
+          ...tooltipItem(p),
+          formatter: (x: { dataIndex: number }) => {
+            const r = data[x.dataIndex]
+            return `<b>${r.name}</b><br/>预算 ${r.bud}′ → 实际 ${r.act}′<br/>偏差 ${
+              r.d > 0 ? '+' : ''
+            }${r.d}′`
+          },
+        },
+        grid: grid({ left: 4, right: 56, top: 18, bottom: 26 }),
+        xAxis: valAxis(p, {
+          name: '相对预算的偏差（分钟）',
+          nameTextStyle: axisName(p),
+          nameLocation: 'middle',
+          nameGap: 26,
+          min: -14,
+          max: 8,
+          interval: 2,
+        }),
+        yAxis: catAxis(
+          data.map((r) => r.name),
+          p,
+          { inverse: true, axisLabel: { color: p.text, fontSize: 12 } },
+        ),
+        series: [
+          {
+            type: 'bar',
+            barWidth: 16,
+            data: data.map((r) => ({
+              value: r.d,
+              name: r.name,
+              itemStyle: {
+                // 偏差超过 3 分钟才算真出问题
+                color: Math.abs(r.d) >= 3 ? p.series[0] : p.series[4],
+                borderRadius: 3,
+              },
+              label: {
+                show: true,
+                position: r.d < 0 ? 'left' : 'right',
+                distance: 8,
+                color: p.text,
+                fontSize: 11.5,
+                formatter: `${r.d > 0 ? '+' : '−'}${Math.abs(r.d).toFixed(1)}′`,
+              },
+            })),
+            markLine: {
+              silent: true,
+              symbol: 'none',
+              lineStyle: { color: p.axis, width: 1.2 },
+              label: { show: false },
+              data: [{ xAxis: 0 }],
             },
           },
         ],

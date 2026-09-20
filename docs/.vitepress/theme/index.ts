@@ -1,6 +1,7 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
 import GkChart from './components/GkChart.vue'
+import 'katex/dist/katex.min.css'
 import './custom.css'
 
 export default {

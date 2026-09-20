@@ -12,6 +12,8 @@
     "vitepress": "^1.6.3"
   },
   "dependencies": {
-    "echarts": "^6.1.0"
+    "echarts": "^6.1.0",
+    "katex": "^0.18.7",
+    "markdown-it-texmath": "^1.0.0"
   }
 }

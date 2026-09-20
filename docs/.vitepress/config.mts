@@ -1,4 +1,6 @@
 import { defineConfig } from 'vitepress'
+import texmath from 'markdown-it-texmath'
+import katex from 'katex'
 
 export default defineConfig({
   lang: 'zh-CN',
@@ -12,6 +14,34 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#8c1f28' }],
     ['meta', { name: 'description', content: '国考副省级备考速查站：行测六模块速查卡 + 申论方法框架' }]
   ],
+
+  markdown: {
+    config: (md) => {
+      // KaTeX 数学公式：行内 $...$，独立成行 $$...$$。
+      // 在构建期就把公式渲染成 HTML（客户端零 JS），比 MathJax 更快。
+      md.use(texmath, {
+        engine: katex,
+        delimiters: 'dollars',
+        katexOptions: { throwOnError: false, strict: false, output: 'html' }
+      })
+
+      // texmath 默认输出 <eq>/<eqn> 自定义标签，Vue 会把它当成未知组件渲染成空注释。
+      // 这里覆盖渲染器，直接输出 KaTeX 自己的 <span class="katex"> / .katex-display。
+      const render = (tex: string, displayMode: boolean) =>
+        katex.renderToString(tex, {
+          displayMode,
+          throwOnError: false,
+          strict: false,
+          output: 'html'
+        })
+
+      const rules = md.renderer.rules
+      rules.math_inline = (tokens: any[], idx: number) => render(tokens[idx].content, false)
+      rules.math_inline_double = (tokens: any[], idx: number) => render(tokens[idx].content, true)
+      rules.math_block = (tokens: any[], idx: number) => render(tokens[idx].content, true)
+      rules.math_block_eqno = (tokens: any[], idx: number) => render(tokens[idx].content, true)
+    }
+  },
 
   themeConfig: {
     siteTitle: '考公笔记',
@@ -31,6 +61,7 @@ export default defineConfig({
         ]
       },
       { text: '申论', link: '/07-申论/申论总览' },
+      { text: '套卷记录', link: '/09-套卷记录' },
       { text: '工具', link: '/08-工具/遗忘曲线排期' }
     ],
 
@@ -42,6 +73,13 @@ export default defineConfig({
           { text: '备考总览', link: '/00-总览/备考总览' },
           { text: '行测战略地图', link: '/00-总览/行测战略地图' },
           { text: '模考复盘法', link: '/00-总览/模考复盘法' }
+        ]
+      },
+      {
+        text: '套卷记录',
+        collapsed: false,
+        items: [
+          { text: '套卷记录', link: '/09-套卷记录' }
         ]
       },
       {

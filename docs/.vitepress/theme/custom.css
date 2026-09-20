@@ -101,6 +101,26 @@
   color: var(--vp-c-danger-1);
 }
 
+/* ── KaTeX 公式 ─────────────────────────────────────────────
+ * 1) 公式颜色继承正文，明暗主题自动适配；
+ * 2) 独立成行的公式太宽时横向滚动，不撑破版面；
+ * 3) 给独立公式留出上下呼吸空间。
+ */
+.katex {
+  font-size: 1.06em;
+}
+
+.katex-display {
+  margin: 14px 0;
+  padding: 2px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex-display::-webkit-scrollbar {
+  height: 6px;
+}
+
 @media (max-width: 640px) {
   .gk-cd .num {
     font-size: 36px;
