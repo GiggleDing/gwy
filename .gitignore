@@ -7,7 +7,7 @@
 **/*.rs.bk
 *.log
 .DS_Store
-.direnv/node_modules/
+.direnv/
 .idea
 .qa/
 .vscode
