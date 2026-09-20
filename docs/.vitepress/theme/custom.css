@@ -554,6 +554,19 @@
   text-align: left;
 }
 
+/* 这张表是手写在组件里的，吃不到 .gk-table 的重置，必须自己清两处 VitePress 默认底色：
+   · .vp-doc th { background-color: var(--vp-c-bg-soft) } → 行头「总分/行测/申论」会带灰底
+   · .vp-doc tr:nth-child(2n) { background-color: var(--vp-c-bg-soft) } → 偶数行变斑马纹
+   不清的话第一列灰一块、第二行灰一条，整张矩阵看着像坏了。 */
+.gk-home .gk-targets tbody tr,
+.gk-home .gk-targets tbody tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+.gk-home .gk-targets tbody th {
+  background-color: transparent;
+}
+
 .gk-home .gk-targets thead th {
   padding: 10px 0;
   background: transparent;
