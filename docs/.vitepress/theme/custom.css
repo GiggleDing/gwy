@@ -1,14 +1,17 @@
 /**
- * 考公笔记 · 设计层
+ * 考公笔记 · 设计层（方案甲 · 精修）
+ * ============================================================================
+ * 口径：骨架完全沿用 VitePress，这里只做四件事——
+ *   1. 配色 —— 只留朱红一个强调色，把它补成可用的梯度；其余全靠中性色。
+ *   2. 字体 —— 拉丁走 Inter，汉字落系统黑体；中文行距、字重、字号层级逐级对齐。
+ *   3. 节奏 —— 4px 基准的间距刻度 + 统一 1px 细线分隔，不堆边框、不加投影。
+ *   4. 首页 —— 从「目录」改成「今天该干什么」，但沿用 VitePress 卡片原生语言。
  *
- * 设计原则：骨架仍然完全交给 VitePress，这里只做三件事——
- *   1. 把「品牌色」补成一条可用的梯度，并把按钮三态显式钉死（深色主题下
- *      链接必须变亮，但按钮垫白字的底色不能跟着变亮，两者是冲突的）；
- *   2. 把中文正文的排版基线调对：字号层级 32/24/20/16、行距 1.8、
- *      阅读宽度 768px、统一的 8pt 间距刻度；
- *   3. 首页从「目录」改成「今天干什么」的工作台。
- *
- * 所有颜色都逐档验算过对比度，明暗两套主题都在 WCAG AA 之上。
+ * ⚠️ 覆盖 VitePress 时注意权重：
+ *   · 组件内的 scoped 样式带 [data-v-xxx] 属性选择器，权重比同名全局类高一级，
+ *     所以覆盖 hero / VPDoc 时要多带一层祖先类（如 .VPHome .VPHero .name）。
+ *   · .vp-doc xxx 是 (0,1,1)，比单个类 (0,1,0) 高；首页组件内样式一律带 .gk-home 前缀。
+ * ============================================================================
  */
 
 /* ==========================================================================
@@ -16,22 +19,24 @@
    ========================================================================== */
 
 :root {
-  /* ── 品牌：朱红三档梯度 ────────────────────────────────────────────
-   * brand-3 是按钮常态底色，brand-2 悬停（更深一档），brand-1 激活 + 正文链接。
-   * 三档垫白字的对比度依次 5.4 / 5.9 / 7.4，brand-1 在白底上作链接 7.4。
+  /* ── 强调色：朱红三档 ────────────────────────────────────────────
+   * brand-1 作正文链接与按钮激活态，在白底上 7.4:1；
+   * brand-3 是按钮常态底色，垫白字 5.9:1。三级单调递深，符合 VitePress
+   * 「常态最亮 → 悬停更深 → 激活最深」的默认关系。
    */
   --vp-c-brand-1: #a3242e;
-  --vp-c-brand-2: #b8313c;
-  --vp-c-brand-3: #c0392b;
-  --vp-c-brand-soft: rgba(163, 36, 46, 0.12);
+  --vp-c-brand-2: #8b1d26;
+  --vp-c-brand-3: #b8313c;
+  --vp-c-brand-soft: rgba(163, 36, 46, 0.08);
 
+  /* 提示块（::: tip）走品牌色软底，压到 0.08 才不刺眼 */
   --vp-c-tip-1: var(--vp-c-brand-1);
   --vp-c-tip-2: var(--vp-c-brand-2);
   --vp-c-tip-3: var(--vp-c-brand-3);
   --vp-c-tip-soft: var(--vp-c-brand-soft);
 
-  /* 按钮三态显式声明：深色主题里 brand-1 会变亮，若沿用默认映射，
-     激活态的按钮会变成「浅底白字」，这里把它钉死在深红侧。 */
+  /* 按钮三态显式声明：深色主题下 brand-1 会变亮，
+     若沿用默认映射，激活态会变成「浅底白字」 */
   --vp-button-brand-text: #fff;
   --vp-button-brand-bg: var(--vp-c-brand-3);
   --vp-button-brand-hover-text: #fff;
@@ -39,95 +44,114 @@
   --vp-button-brand-active-text: #fff;
   --vp-button-brand-active-bg: var(--vp-c-brand-1);
 
-  /* ── 8pt 间距刻度 ───────────────────────────────────────────────── */
-  --gk-s1: 8px;
-  --gk-s2: 16px;
-  --gk-s3: 24px;
-  --gk-s4: 32px;
-  --gk-s5: 40px;
-  --gk-s6: 48px;
+  /* ── 中性色：不覆盖，直接用 VitePress 的 text-1/2/3 与 divider ── */
 
-  /* ── 圆角 ──────────────────────────────────────────────────────── */
-  --gk-radius-sm: 8px;
-  --gk-radius: 10px;
-  --gk-radius-lg: 14px;
+  /* ── 间距刻度（4px 基准）─────────────────────────────────────── */
+  --gk-1: 4px;
+  --gk-2: 8px;
+  --gk-3: 12px;
+  --gk-4: 16px;
+  --gk-5: 24px;
+  --gk-6: 32px;
+  --gk-7: 48px;
+  --gk-8: 64px;
 
-  /* ── 正文可读宽度：768px ≈ 每行 44 个汉字 ─────────────────────── */
+  /* ── 圆角：12px 对齐 VitePress 原生卡片（VPFeature）─────────── */
+  --gk-r-sm: 6px;
+  --gk-r: 10px;
+  --gk-r-lg: 12px;
+
+  /* ── 正文可读宽度上限（1280 视口下实际取到 656，见 §2）──────── */
   --gk-read-width: 768px;
 
-  /* ── 中文优先的字体栈：拉丁走 Inter，汉字落系统黑体 ───────────── */
+  /* ── 字体：拉丁 Inter，汉字落系统黑体。PingFang 必须在通用族之前，
+   *   否则汉字会掉到 sans-serif 的默认宋体/苹方兜底上，字重也对不齐。── */
   --vp-font-family-base:
-    'Inter', ui-sans-serif, system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', 'Noto Sans SC', 'Source Han Sans SC', sans-serif;
-
-  /* ── 模块角色配色（首页作战板 / 状态徽章）─────────────────────────
-   * 每种角色一个前景色 + 一个低透明底色，前景色在白色底上均 ≥ 5.9:1。
-   */
-  --gk-tone-main-fg: #a3242e;
-  --gk-tone-main-bg: rgba(163, 36, 46, 0.1);
-  --gk-tone-warn-fg: #8a5a00;
-  --gk-tone-warn-bg: rgba(186, 117, 23, 0.14);
-  --gk-tone-good-fg: #2f6b1f;
-  --gk-tone-good-bg: rgba(99, 153, 34, 0.14);
-  --gk-tone-info-fg: #1a4f87;
-  --gk-tone-info-bg: rgba(55, 138, 221, 0.14);
-  --gk-tone-mute-fg: #5f5e5a;
-  --gk-tone-mute-bg: rgba(136, 135, 128, 0.14);
+    'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
+    'Source Han Sans SC', 'Noto Sans SC', 'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
 }
 
 .dark {
-  /* 深色下链接必须变亮才读得清（#ef8891 在 #1b1b1f 上 7.0:1）…… */
-  --vp-c-brand-1: #ef8891;
-  --vp-c-brand-2: #c94a53;
-  /* ……但按钮底色留在深红侧，垫白字仍有 4.9:1 */
+  /* 深色下链接必须变亮（#ec8b93 在 #1b1b1f 上 7.4:1）…… */
+  --vp-c-brand-1: #ec8b93;
+  --vp-c-brand-2: #d9636d;
+  /* ……但按钮底色要留在深红侧，垫白字 4.9:1 */
   --vp-c-brand-3: #b03840;
-  --vp-c-brand-soft: rgba(239, 136, 145, 0.16);
+  --vp-c-brand-soft: rgba(236, 139, 147, 0.12);
 
   --vp-button-brand-bg: #b03840;
-  --vp-button-brand-hover-bg: #c94a53;
-  --vp-button-brand-active-bg: #8c1f28;
-
-  --gk-tone-main-fg: #ef8891;
-  --gk-tone-main-bg: rgba(239, 136, 145, 0.14);
-  --gk-tone-warn-fg: #e0a83f;
-  --gk-tone-warn-bg: rgba(224, 168, 63, 0.14);
-  --gk-tone-good-fg: #8ec96a;
-  --gk-tone-good-bg: rgba(142, 201, 106, 0.14);
-  --gk-tone-info-fg: #7fb6ea;
-  --gk-tone-info-bg: rgba(127, 182, 234, 0.14);
-  --gk-tone-mute-fg: #a9a8a1;
-  --gk-tone-mute-bg: rgba(169, 168, 161, 0.14);
+  --vp-button-brand-hover-bg: #d9636d;
+  --vp-button-brand-active-bg: #8b1d26;
 }
 
 /* ==========================================================================
-   2. 正文排版基线
+   2. 排版基线
    ========================================================================== */
 
-/* 阅读宽度 688 → 768：表格和图表在原宽度下被挤得厉害 */
-.VPDoc.has-aside .content-container {
+/* 正文列：768 只是上限，真正卡住它的是外层分配——
+   .VPContent 内容盒 944 = .content 688 + .aside 256，而 .content 自带 32×2 内边距，
+   正文实际只剩 624px（图表和表格都偏窄）。下面把两边内边距各收一点，
+   正文拿到 656px；目录栏实宽保住 224px，本页导航的长标题才不会被省略号截断。 */
+.VPContent .VPDoc.has-aside .content-container {
   max-width: var(--gk-read-width);
 }
 
-/* 但 768 只是个上限，真正卡住正文的是外层分配：
-   .content 688 + .aside 256 = .container 944，而 .content 自己又留了 32×2 内边距，
-   正文实际只剩 624px（图表和表格都偏窄）。这里把两边的内边距各收一点，
-   正文拿到 656px。注意目录栏的「实宽」要保住 224px，否则本页导航的长标题
-   会被 ellipsis 截断。 */
 @media (min-width: 1280px) {
-  .VPDoc .aside {
+  .VPContent .VPDoc .aside {
     max-width: 240px;
     padding-left: 16px;
   }
 
-  .VPDoc .content {
+  .VPContent .VPDoc .content {
     padding-left: 24px;
     padding-right: 24px;
   }
 }
 
-/* 汉字比拉丁字母需要更大行距，1.75 → 1.8，并把 UA 的 p 边距变成显式值 */
+/* ── 标题层级 30 / 24 / 20 / 16 ──────────────────────────────────────
+ * 原版是 28 / 24 / 20 / 18：h1 与 h2 只差 4px，页面标题压不住大节标题；
+ * h4 又和 h3 只差 2px，读起来是同一级。拉开成 30/24 与 20/16 后四级分明。 */
+.vp-doc h1 {
+  font-size: 30px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.vp-doc h2 {
+  margin: var(--gk-7) 0 var(--gk-4);
+  padding-top: var(--gk-5);
+  font-size: 24px;
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.vp-doc h3 {
+  margin: var(--gk-6) 0 var(--gk-3);
+  font-size: 20px;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.vp-doc h4 {
+  margin: var(--gk-5) 0 var(--gk-2);
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.vp-doc h5,
+.vp-doc h6 {
+  margin: var(--gk-4) 0 var(--gk-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── 正文：汉字比拉丁需要更大行距，1.75 → 1.8 ────────────────────── */
 .vp-doc p {
-  margin: var(--gk-s2) 0;
+  margin: var(--gk-4) 0;
   line-height: 1.8;
 }
 
@@ -135,38 +159,46 @@
   line-height: 1.8;
 }
 
-/* 字号层级拉成 32 / 24 / 20 / 16 四级。
-   原来是 28 / 24 / 20 / 18 —— h1 和 h2 只差 4px，页面标题压不住大节标题；
-   h4 又和 h3 只差 2px，读起来是同一个层级。 */
-.vp-doc h1 {
-  font-size: 32px;
-  line-height: 1.4;
-}
-
-.vp-doc h2 {
-  margin: var(--gk-s6) 0 var(--gk-s2);
-  line-height: 1.45;
-}
-
-/* h3 / h4 原版没有下边距，标题会直接贴住正文 */
-.vp-doc h3 {
-  margin: var(--gk-s4) 0 var(--gk-s1);
-  line-height: 1.5;
-}
-
-.vp-doc h4 {
-  margin: var(--gk-s3) 0 var(--gk-s1);
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-/* 列表项之间给出呼吸，长清单才分得开 */
 .vp-doc li + li {
-  margin-top: 10px;
+  margin-top: var(--gk-2);
 }
 
 .vp-doc ol > li::marker {
   color: var(--vp-c-text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 链接：下划线压到 1px 的浅朱红，悬停时才加深 ─────────────────── */
+.vp-doc a {
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--vp-c-brand-soft);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color 0.2s,
+    text-decoration-color 0.2s;
+}
+
+.vp-doc a:hover {
+  color: var(--vp-c-brand-2);
+  text-decoration-color: currentColor;
+}
+
+/* ── 本页导航（右侧目录）─────────────────────────────────────────
+ * VitePress 默认给条目挂 nowrap + 省略号，而内栏实宽只有 224px，
+ * 中文标题到 16 字就被截掉半句（「核心概念与公式」一页有 5 条中招）。
+ * 这里放开折行：折行与首行同缩进，信息不丢；行高从 32px 收到 1.5，
+ * 免得换成两行后整套目录被撑得过长。
+ */
+.VPDoc .aside .outline-link {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  line-height: 1.5;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 /* ==========================================================================
@@ -174,12 +206,13 @@
    ========================================================================== */
 
 /* ── 表格 ────────────────────────────────────────────────────────────
- * VitePress 默认给 <table> 挂 display:block + overflow-x:auto，表格会塌缩
- * 成内容宽度（窄表只占半行）。markdown 侧已经外包了 .gk-table，
+ * VitePress 给 <table> 挂 display:block + overflow-x:auto，表格会塌缩成内容宽度
+ * （窄表只占半行）。markdown 侧已由 config.mts 外包 .gk-table 滚动容器，
  * 这里让外层负责滚动、表格本身仍是 table：窄表撑满，宽表整块滚动。
+ * 同时去掉斑马纹，只留悬停高亮 + 1px 细线，画面更安静。
  */
 .vp-doc .gk-table {
-  margin: var(--gk-s3) 0;
+  margin: var(--gk-5) 0;
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -193,12 +226,28 @@
 
 .vp-doc .gk-table th,
 .vp-doc .gk-table td {
-  padding: 10px 14px;
+  padding: 11px 16px;
+}
+
+.vp-doc .gk-table th {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc .gk-table tbody tr,
+.vp-doc .gk-table tbody tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+.vp-doc .gk-table tbody tr:hover {
+  background-color: var(--vp-c-bg-soft);
 }
 
 /* 首列基本是「项 / 模块 / 时间」，加一点字重让它当扫描锚点 */
 .vp-doc .gk-table tbody td:first-child {
   font-weight: 500;
+  color: var(--vp-c-text-1);
 }
 
 .vp-doc .gk-table::-webkit-scrollbar {
@@ -210,15 +259,13 @@
   background-color: var(--vp-c-divider);
 }
 
-/* ── 引用块：从「一条灰线」升级成结论卡 ────────────────────────────
- * 这些页里的 `>` 引用的都是全页最该记住的一句话，值得给品牌色和底色。
- */
+/* ── 引用块：这些页里的 `>` 都是全页最该记住的一句话 ─────────────── */
 .vp-doc blockquote {
-  margin: var(--gk-s3) 0;
-  border-left: 3px solid var(--vp-c-brand-3);
-  border-radius: 0 var(--gk-radius) var(--gk-radius) 0;
+  margin: var(--gk-5) 0;
+  border-left: 2px solid var(--vp-c-brand-3);
+  border-radius: 0 var(--gk-r-sm) var(--gk-r-sm) 0;
   background-color: var(--vp-c-bg-soft);
-  padding: 12px 18px;
+  padding: 14px 20px;
 }
 
 .vp-doc blockquote > p {
@@ -228,18 +275,15 @@
 }
 
 .vp-doc blockquote > p + p {
-  margin-top: var(--gk-s1);
+  margin-top: var(--gk-2);
 }
 
-/* ── 提示块 ──────────────────────────────────────────────────────────
- * 保留 VitePress 的「类型色边框 + 淡底」，只把左侧拉粗成强调条，
- * 一屏里有三四个提示块时能靠左侧色带快速分辨。
- */
+/* ── 提示块：保留类型色，左侧拉粗成 3px 强调条便于扫读 ───────────── */
 .vp-doc .custom-block {
-  margin: var(--gk-s3) 0;
+  margin: var(--gk-5) 0;
   border-left-width: 3px;
-  border-radius: var(--gk-radius);
-  padding: 14px 18px;
+  border-radius: var(--gk-r);
+  padding: 14px 20px;
 }
 
 .vp-doc .custom-block p {
@@ -250,27 +294,25 @@
   margin-bottom: 0;
 }
 
-/* ── 代码块 ──────────────────────────────────────────────────────── */
+/* ── 代码 ────────────────────────────────────────────────────────── */
 .vp-doc div[class*='language-'] {
-  margin: var(--gk-s3) 0;
-  border-radius: var(--gk-radius);
+  margin: var(--gk-5) 0;
+  border-radius: var(--gk-r);
 }
 
 .vp-doc :not(pre) > code {
   border-radius: 5px;
   padding: 2px 6px;
+  font-size: 0.9em;
 }
 
-/* ── KaTeX 公式 ────────────────────────────────────────────────────
- * 1) 公式颜色继承正文，明暗主题自动适配；
- * 2) 独立成行的公式太宽时横向滚动，不撑破版面。
- */
+/* ── KaTeX：颜色继承正文，独立公式太宽时横向滚动 ─────────────────── */
 .katex {
   font-size: 1.06em;
 }
 
 .katex-display {
-  margin: var(--gk-s3) 0;
+  margin: var(--gk-5) 0;
   padding: 2px 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -289,10 +331,10 @@
  * 这样 ECharts 里饼图的白色/深色描边才能和页面底色对齐。
  */
 .gk-chart {
-  margin: var(--gk-s3) 0 var(--gk-s4);
+  margin: var(--gk-6) 0 var(--gk-7);
   padding: 20px 20px 4px;
   border: 1px solid var(--vp-c-divider);
-  border-radius: var(--gk-radius-lg);
+  border-radius: var(--gk-r-lg);
 }
 
 .gk-chart__canvas {
@@ -300,7 +342,7 @@
 }
 
 .gk-chart__caption {
-  margin: var(--gk-s1) 0 var(--gk-s2);
+  margin: var(--gk-2) 0 var(--gk-4);
   font-size: 12.5px;
   line-height: 1.75;
   color: var(--vp-c-text-3);
@@ -313,18 +355,60 @@
 }
 
 /* ==========================================================================
-   5. 首页工作台
+   5. 首页 · Hero 精修
+   ========================================================================== */
+
+/* 原版 hero 是 56px / 700 字重 + 上下 144 / 64px 留白，占掉首屏 392px，
+   在一份个人笔记站上过重。收到 44px / 600 并把留白收紧，
+   首屏就能同时看到时间条和第一排模块卡。 */
+.VPHome .VPHero {
+  padding-top: calc(var(--vp-nav-height) + 56px);
+  padding-bottom: var(--gk-6);
+}
+
+.VPHome .VPHero .name,
+.VPHome .VPHero .text {
+  max-width: none;
+  font-size: 44px;
+  line-height: 54px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.VPHome .VPHero .tagline {
+  max-width: none;
+  padding-top: var(--gk-3);
+  font-size: 17px;
+  line-height: 30px;
+  font-weight: 400;
+  color: var(--vp-c-text-2);
+}
+
+.VPHome .VPHero .actions {
+  padding-top: var(--gk-6);
+}
+
+/* 按钮从 20px 胶囊改成 8px 圆角——和导航搜索框（8px）、卡片（12px）同一套半径 */
+.VPHome .VPHero .actions .VPButton {
+  border-radius: var(--gk-r-sm);
+  padding: 0 20px;
+  line-height: 40px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   6. 首页 · 工作台
    ==========================================================================
  * 全部选择器都收进 .gk-home 命名空间：首页内容同样挂在 .vp-doc 下，
- * 而 .vp-doc ul / .vp-doc p 的权重是 (0,1,1)，比单个类 (.gk-xxx) 高，
- * 不前缀就会被「padding-left: 1.25rem + 圆点 + 段落 16px 边距」全部污染。
+ * 而 .vp-doc ul / .vp-doc p 的权重是 (0,1,1)，比单个类高，
+ * 不前缀就会被「padding-left: 1.25rem + 圆点 + 段落 16px 边距」污染。
  */
 
 .gk-home {
-  padding-bottom: var(--gk-s6);
+  padding-bottom: 0;
 }
 
-/* 兜底：工作台内部的列表一律不要 VitePress 的列表样式和项间距 */
 .gk-home ul,
 .gk-home ol {
   margin: 0;
@@ -336,18 +420,28 @@
   margin-top: 0;
 }
 
-/* ── 小节标题：不走 .vp-doc h2，避免被 h2 的分节横线打断节奏 ────── */
+.gk-home table {
+  display: table;
+  width: auto;
+  margin: 0;
+  border-collapse: collapse;
+  overflow: visible;
+}
+
+/* ── 小节标题 ────────────────────────────────────────────────────── */
 .gk-home .gk-sec {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 10px;
-  margin: var(--gk-s5) 0 var(--gk-s2);
-  padding-top: 0;
-  border-top: 0;
+  gap: var(--gk-2) var(--gk-4);
+  margin: var(--gk-8) 0 var(--gk-5);
+  padding: 0;
+  border: 0;
   font-size: 17px;
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: 0;
+  color: var(--vp-c-text-1);
 }
 
 .gk-home .gk-sec--flush {
@@ -360,159 +454,170 @@
   color: var(--vp-c-text-3);
 }
 
-/* ── 计时卡 ──────────────────────────────────────────────────────── */
+/* ── 时间条：不套卡片，靠上细线 + 字号对比立住 ──────────────────── */
 .gk-home .gk-clock {
-  margin-top: var(--gk-s3);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: var(--gk-radius-lg);
-  background-color: var(--vp-c-bg-soft);
-  overflow: hidden;
+  margin-top: var(--gk-6);
+  padding-top: var(--gk-6);
+  border-top: 1px solid var(--vp-c-divider);
 }
 
-.gk-home .gk-clock__grid {
+.gk-home .gk-clock__row {
   display: grid;
-  grid-template-columns: 1fr;
-}
-
-.gk-home .gk-clock__cell {
-  padding: var(--gk-s3);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gk-5);
 }
 
 .gk-home .gk-clock__k {
   margin: 0;
-  font-size: 12.5px;
+  font-size: 12px;
+  font-weight: 500;
   line-height: 1.6;
-  color: var(--vp-c-text-2);
+  letter-spacing: 0.06em;
+  color: var(--vp-c-text-3);
 }
 
-.gk-home .gk-clock__v {
-  margin: var(--gk-s1) 0 0;
-  font-size: 34px;
+/* 天数用大字号撑住左半边，天/时分秒 用 flex + baseline 贴在大数字基线上 */
+.gk-home .gk-clock__days {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gk-3);
+  margin: var(--gk-3) 0 0;
+  font-size: 56px;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1;
+  letter-spacing: -0.02em;
   color: var(--vp-c-text-1);
   font-variant-numeric: tabular-nums;
 }
 
-.gk-home .gk-clock__v small {
-  margin-left: 4px;
-  font-size: 15px;
+.gk-home .gk-clock__days em {
+  font-size: 16px;
+  font-style: normal;
   font-weight: 400;
+  letter-spacing: 0;
   color: var(--vp-c-text-2);
 }
 
-.gk-home .gk-clock__v--time {
-  color: var(--vp-c-brand-1);
+.gk-home .gk-clock__days b {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--vp-c-text-3);
 }
 
-.gk-home .gk-clock__sub {
-  margin: var(--gk-s1) 0 0;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--vp-c-text-3);
+.gk-home .gk-clock__now {
+  margin: var(--gk-3) 0 0;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--vp-c-brand-1);
   font-variant-numeric: tabular-nums;
 }
 
-/* 目标刻度：1px 间隙 + 分隔线底色画细线，比逐格加 border 干净 */
-.gk-home .gk-goals {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background-color: var(--vp-c-divider);
+.gk-home .gk-clock__meta {
+  margin: var(--gk-4) 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 三层目标矩阵 ────────────────────────────────────────────────── */
+.gk-home .gk-targets {
+  margin-top: var(--gk-5);
   border-top: 1px solid var(--vp-c-divider);
 }
 
-.gk-home .gk-goals > li {
-  background-color: var(--vp-c-bg-soft);
-  padding: 12px var(--gk-s2);
+.gk-home .gk-targets th,
+.gk-home .gk-targets td {
+  padding: 11px 0;
+  border: 0;
+  border-bottom: 1px solid var(--vp-c-divider);
+  text-align: right;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
 }
 
-.gk-home .gk-goals__k {
-  display: block;
+/* 首列是行/列名，永远左对齐；其余三列右对齐，数字才能按位对齐 */
+.gk-home .gk-targets th:first-child {
+  text-align: left;
+}
+
+.gk-home .gk-targets thead th {
+  padding: 10px 0;
+  background: transparent;
   font-size: 12px;
-  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--vp-c-text-3);
+}
+
+.gk-home .gk-targets tbody th {
+  padding-right: var(--gk-5);
+  font-size: 13px;
+  font-weight: 500;
   color: var(--vp-c-text-2);
 }
 
-.gk-home .gk-goals__v {
-  display: block;
-  margin-top: 4px;
-  font-size: 20px;
+/* 三列之间给出等距间隔，数字才对得齐 */
+.gk-home .gk-targets thead th + th,
+.gk-home .gk-targets tbody td {
+  padding-left: var(--gk-6);
+}
+
+.gk-home .gk-targets tbody td {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--vp-c-text-1);
+}
+
+/* 「冲刺」是整页唯一的取舍信号：矩阵里这一列、模块卡里的这一项，都用朱红。
+   保底/达标保持正文色，靠字重区分——不把三档都上色，颜色才留得住指示力。 */
+.gk-home .gk-targets td.is-sprint {
   font-weight: 600;
-  line-height: 1.3;
+  color: var(--vp-c-brand-1);
+}
+
+.gk-home .gk-targets__foot {
+  margin: var(--gk-4) 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--vp-c-text-2);
+}
+
+.gk-home .gk-targets__foot b {
+  font-weight: 600;
   color: var(--vp-c-text-1);
   font-variant-numeric: tabular-nums;
 }
 
-.gk-home .gk-goals__v span {
-  margin-left: 3px;
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--vp-c-text-3);
-}
-
-.gk-home .gk-goals__v--main {
+.gk-home .gk-targets__foot b.is-accent {
   color: var(--vp-c-brand-1);
 }
 
-/* ── 角色徽章 ────────────────────────────────────────────────────── */
-.gk-role {
-  display: inline-block;
-  padding: 1px 8px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 18px;
-  white-space: nowrap;
-}
-
-.gk-role--main {
-  color: var(--gk-tone-main-fg);
-  background-color: var(--gk-tone-main-bg);
-}
-
-.gk-role--warn {
-  color: var(--gk-tone-warn-fg);
-  background-color: var(--gk-tone-warn-bg);
-}
-
-.gk-role--good {
-  color: var(--gk-tone-good-fg);
-  background-color: var(--gk-tone-good-bg);
-}
-
-.gk-role--info {
-  color: var(--gk-tone-info-fg);
-  background-color: var(--gk-tone-info-bg);
-}
-
-.gk-role--mute {
-  color: var(--gk-tone-mute-fg);
-  background-color: var(--gk-tone-mute-bg);
-}
-
-/* ── 模块作战板 ──────────────────────────────────────────────────── */
+/* ── 模块卡：沿用 VitePress 原生 VPFeature 的语言 ─────────────────
+ * 浅灰填充 + 12px 圆角 + 无边框，悬停才描出品牌色边。 */
 .gk-home .gk-board {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--gk-s2);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gk-4);
 }
 
-/* 申论只有一个模块，用整行卡：三列网格里放单个卡片会空出三分之二。
-   这里带上 ul 提高权重——否则会被下面断点里的 repeat(3, 1fr) 反超。 */
+/* 申论只有一个模块，用整行卡；带 ul 是为了压过下面断点里的三列规则 */
 .gk-home ul.gk-board--single {
+  margin-top: var(--gk-4);
   grid-template-columns: minmax(0, 1fr);
 }
 
 .gk-home a.gk-mod {
   display: flex;
   flex-direction: column;
-  gap: var(--gk-s1);
   height: 100%;
-  padding: 14px 16px 16px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: var(--gk-radius);
-  background-color: var(--vp-c-bg);
+  padding: 20px 22px;
+  border: 1px solid transparent;
+  border-radius: var(--gk-r-lg);
+  background-color: var(--vp-c-bg-soft);
   color: inherit;
   font-weight: 400;
   text-decoration: none;
@@ -522,235 +627,309 @@
 }
 
 .gk-home a.gk-mod:hover {
-  border-color: var(--vp-c-brand-2);
-  background-color: var(--vp-c-bg-soft);
+  border-color: var(--vp-c-brand-1);
 }
 
-.gk-mod__head {
+.gk-mod__top {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: baseline;
+  gap: var(--gk-3);
 }
 
 .gk-mod__name {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 600;
+  line-height: 1.5;
   color: var(--vp-c-text-1);
 }
 
-.gk-mod__n {
+.gk-mod__count {
+  margin-left: auto;
   font-size: 12px;
   color: var(--vp-c-text-3);
   font-variant-numeric: tabular-nums;
 }
 
-.gk-mod__head .gk-role {
-  margin-left: auto;
+/* 角色只用文字 + 三档明度区分：accent 现在就该动 / base 维持 / quiet 有意放着。
+   六个彩色徽章会把首页变成仪表盘，这里刻意不做。 */
+.gk-mod__role {
+  margin-top: var(--gk-1);
+  margin-bottom: var(--gk-4);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
 }
 
-/* 首考战绩是「已发生的数据」，用次要色；下一步是「要做的事」，用主色 */
-.gk-mod__score {
+.gk-mod__role.is-accent {
+  color: var(--vp-c-brand-1);
+}
+
+.gk-mod__role.is-base {
+  color: var(--vp-c-text-2);
+}
+
+.gk-mod__role.is-quiet {
+  color: var(--vp-c-text-3);
+}
+
+/* 三行「标签 + 值」的小规格表，margin-top:auto 让各卡的细线互相对齐 */
+.gk-mod__body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: var(--gk-4);
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.gk-mod__row {
+  display: flex;
+  gap: var(--gk-3);
+}
+
+.gk-mod__lb {
+  flex: none;
+  width: 44px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--vp-c-text-3);
+}
+
+.gk-mod__vl {
+  min-width: 0;
   font-size: 13px;
-  line-height: 1.65;
+  line-height: 1.7;
   color: var(--vp-c-text-2);
   font-variant-numeric: tabular-nums;
 }
 
-.gk-mod__next {
-  margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px dashed var(--vp-c-divider);
-  font-size: 13px;
-  line-height: 1.65;
+.gk-mod__vl b {
+  font-weight: 600;
   color: var(--vp-c-text-1);
 }
 
-.gk-mod__next::before {
-  content: '→ ';
+.gk-mod__vl b.is-sprint {
+  color: var(--vp-c-brand-1);
+}
+
+.gk-mod__vl--next {
+  font-weight: 500;
+  color: var(--vp-c-text-1);
+}
+
+.gk-mod__vl.is-quiet {
   color: var(--vp-c-text-3);
 }
 
-/* 整行卡：宽屏下把三块摆成一行，窄屏自动退回上下堆叠 */
+/* 宽屏下申论整行卡内部改横排，窄屏自动退回上下堆叠 */
 @media (min-width: 880px) {
   .gk-home a.gk-mod--row {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
-    gap: 6px 20px;
+    gap: var(--gk-2) var(--gk-5);
+    padding: 20px 22px;
   }
 
-  .gk-home a.gk-mod--row .gk-mod__head {
+  .gk-home a.gk-mod--row .gk-mod__top {
     flex: none;
   }
 
-  .gk-home a.gk-mod--row .gk-mod__score {
-    flex: 1 1 auto;
+  .gk-home a.gk-mod--row .gk-mod__count {
+    margin-left: var(--gk-3);
   }
 
-  .gk-home a.gk-mod--row .gk-mod__next {
+  .gk-home a.gk-mod--row .gk-mod__role {
     flex: none;
-    margin-top: 0;
-    padding-top: 0;
-    border-top: 0;
+    margin: 0;
+  }
+
+  .gk-home a.gk-mod--row .gk-mod__body {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--gk-2) var(--gk-5);
+    margin-top: var(--gk-4);
+    padding-top: var(--gk-4);
+    border-top: 1px solid var(--vp-c-divider);
+  }
+
+  .gk-home a.gk-mod--row .gk-mod__vl--next {
+    margin-left: auto;
   }
 }
 
-/* ── 本周重点 ────────────────────────────────────────────────────── */
-.gk-home .gk-focus {
-  display: grid;
-  gap: 10px;
-}
-
-.gk-home .gk-focus > li {
+/* ── 当前推进：编号 + 细线，不做卡片 ─────────────────────────────── */
+.gk-home .gk-steps {
   display: flex;
-  gap: 10px;
-  padding: 12px 16px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: var(--gk-radius);
-  background-color: var(--vp-c-bg-soft);
+  flex-direction: column;
 }
 
-.gk-focus__body {
-  min-width: 0;
+.gk-home .gk-steps > li {
+  display: flex;
+  gap: var(--gk-4);
+  padding: var(--gk-4) 0;
+  border-top: 1px solid var(--vp-c-divider);
 }
 
-.gk-focus__idx {
+.gk-home .gk-steps > li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.gk-home .gk-steps__no {
   flex: none;
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
-  border-radius: 5px;
-  background-color: var(--vp-c-brand-soft);
-  color: var(--vp-c-brand-1);
   font-size: 12px;
   font-weight: 600;
-  line-height: 20px;
-  text-align: center;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  color: var(--vp-c-brand-1);
   font-variant-numeric: tabular-nums;
 }
 
-.gk-focus__t {
+.gk-home .gk-steps__body {
+  min-width: 0;
+}
+
+.gk-home .gk-steps__t {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--vp-c-text-1);
 }
 
-.gk-focus__d {
+.gk-home .gk-steps__d {
   display: block;
   margin-top: 2px;
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--vp-c-text-2);
 }
 
 /* ── 关键节点 ────────────────────────────────────────────────────── */
 .gk-home .gk-nodes {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
 }
 
 .gk-home .gk-nodes > li {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 10px;
-  padding: 9px 12px;
-  border-radius: var(--gk-radius-sm);
-  font-size: 13px;
-  line-height: 1.6;
+  gap: var(--gk-1) var(--gk-3);
+  padding: var(--gk-3) 0;
+  border-top: 1px solid var(--vp-c-divider);
+  font-size: 13.5px;
+  line-height: 1.7;
 }
 
-.gk-node__date {
+.gk-home .gk-nodes > li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.gk-nodes__date {
   flex: none;
-  width: 62px;
+  width: 46px;
   color: var(--vp-c-text-2);
   font-variant-numeric: tabular-nums;
 }
 
-.gk-node__label {
+.gk-nodes__label {
   color: var(--vp-c-text-1);
 }
 
-.gk-node__note {
+.gk-nodes__note {
   font-size: 12px;
   color: var(--vp-c-text-3);
 }
 
-.gk-node__rest {
+.gk-nodes__left {
   margin-left: auto;
   font-size: 12px;
   color: var(--vp-c-text-3);
   font-variant-numeric: tabular-nums;
 }
 
-/* 下一个要到来的节点整行点亮，其余保持静默 */
-.gk-home .gk-nodes > li.is-next {
-  background-color: var(--vp-c-brand-soft);
-}
-
-.gk-home .gk-nodes > li.is-next .gk-node__date,
-.gk-home .gk-nodes > li.is-next .gk-node__label,
-.gk-home .gk-nodes > li.is-next .gk-node__rest {
+/* 下一个要到来的节点：只靠朱红 + 字重，不加底色，保持整页安静 */
+.gk-home .gk-nodes > li.is-next .gk-nodes__date,
+.gk-home .gk-nodes > li.is-next .gk-nodes__label,
+.gk-home .gk-nodes > li.is-next .gk-nodes__left {
   color: var(--vp-c-brand-1);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ── 底部两栏 ────────────────────────────────────────────────────── */
 .gk-home .gk-cols {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--gk-s3);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gk-8);
+  margin-top: var(--gk-8);
 }
 
 /* ==========================================================================
-   6. 断点
+   7. 断点
    ========================================================================== */
 
 @media (min-width: 640px) {
-  .gk-home .gk-clock__grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .gk-home .gk-clock__cell + .gk-clock__cell {
-    border-left: 1px solid var(--vp-c-divider);
-  }
-
-  .gk-home .gk-goals {
-    grid-template-columns: repeat(4, 1fr);
+  .gk-home .gk-clock__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--gk-8);
   }
 }
 
 @media (min-width: 720px) {
   .gk-home .gk-board {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 880px) {
   .gk-home .gk-cols {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--gk-7);
   }
 }
 
-@media (min-width: 1040px) {
+@media (min-width: 1024px) {
   .gk-home .gk-board {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 639px) {
+  .VPHome .VPHero .name,
+  .VPHome .VPHero .text {
+    font-size: 32px;
+    line-height: 42px;
+  }
+
+  .VPHome .VPHero .tagline {
+    font-size: 15px;
+    line-height: 26px;
+  }
+
   .vp-doc h1 {
-    font-size: 27px;
+    font-size: 26px;
   }
 
   .vp-doc h2 {
     font-size: 21px;
   }
 
-  .gk-home .gk-clock__v {
-    font-size: 30px;
+  .gk-home .gk-clock__days {
+    font-size: 42px;
+  }
+
+  .gk-home .gk-clock__now {
+    font-size: 28px;
+  }
+
+  .gk-home .gk-targets thead th + th,
+  .gk-home .gk-targets tbody td {
+    padding-left: var(--gk-5);
   }
 
   .gk-chart {
