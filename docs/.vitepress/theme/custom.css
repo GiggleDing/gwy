@@ -20,9 +20,13 @@
 
 :root {
   /* ── 强调色：朱红三档 ────────────────────────────────────────────
-   * brand-1 作正文链接与按钮激活态，在白底上 7.4:1；
-   * brand-3 是按钮常态底色，垫白字 5.9:1。三级单调递深，符合 VitePress
-   * 「常态最亮 → 悬停更深 → 激活最深」的默认关系。
+   * 这三个变量在 VitePress 里有两套用途，必须分清：
+   *   brand-1 —— 正文链接颜色（白底 7.37:1）
+   *   brand-2 —— 链接 hover 颜色，要比 brand-1 更深（白底 9.12:1）
+   *   brand-3 —— 默认映射给「按钮常态底色」，这里保留数值不用它
+   * 按钮的实际取色在下面单独钉死（--vp-button-brand-*），
+   * 因为「文字用色」和「垫白字的底色」对明度的要求正好相反，
+   * 共用同一组变量必然有一边出错。
    */
   --vp-c-brand-1: #a3242e;
   --vp-c-brand-2: #8b1d26;
@@ -35,14 +39,16 @@
   --vp-c-tip-3: var(--vp-c-brand-3);
   --vp-c-tip-soft: var(--vp-c-brand-soft);
 
-  /* 按钮三态显式声明：深色主题下 brand-1 会变亮，
-     若沿用默认映射，激活态会变成「浅底白字」 */
+  /* 按钮三态必须显式钉死，且要**单调**：常态最浅 → 悬停更深 → 按下最深
+     （垫白字 5.93 / 7.98 / 10.42 : 1）。默认映射会把 active 接到 brand-1 上，
+     而 brand-1 要兼顾「链接色」，接过去就变成「按下比悬停还浅」。
+     深色主题下 brand-1 会变亮，问题更明显，所以两套都得钉。 */
   --vp-button-brand-text: #fff;
-  --vp-button-brand-bg: var(--vp-c-brand-3);
+  --vp-button-brand-bg: #b8313c;
   --vp-button-brand-hover-text: #fff;
-  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-hover-bg: #9b2029;
   --vp-button-brand-active-text: #fff;
-  --vp-button-brand-active-bg: var(--vp-c-brand-1);
+  --vp-button-brand-active-bg: #7d1720;
 
   /* ── 中性色：不覆盖，直接用 VitePress 的 text-1/2/3 与 divider ── */
 
@@ -72,15 +78,19 @@
 }
 
 .dark {
-  /* 深色下链接必须变亮（#ec8b93 在 #1b1b1f 上 7.4:1）…… */
+  /* 深色下链接必须变亮（#ec8b93 在 #1b1b1f 上 7.1:1）…… */
   --vp-c-brand-1: #ec8b93;
   --vp-c-brand-2: #d9636d;
-  /* ……但按钮底色要留在深红侧，垫白字 4.9:1 */
+  /* ……但按钮底色要留在深红侧，垫白字才够 */
   --vp-c-brand-3: #b03840;
   --vp-c-brand-soft: rgba(236, 139, 147, 0.12);
 
+  /* 深色按钮：悬停「提亮」、按下「沉下去」，是触感而不是亮度单调递增。
+     悬停底色不能直接用 brand-2——#d9636d 垫白字只有 3.53:1，
+     收一档到 #c4494f 才够 4.76:1。按下用 #8b1d26（9.12:1）。
+     （VitePress 原生深色按下态是 #a8b1ff 垫白字，实测 2.02:1，不能照抄。） */
   --vp-button-brand-bg: #b03840;
-  --vp-button-brand-hover-bg: #d9636d;
+  --vp-button-brand-hover-bg: #c4494f;
   --vp-button-brand-active-bg: #8b1d26;
 }
 
