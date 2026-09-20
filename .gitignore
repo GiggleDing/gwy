@@ -1,28 +1,36 @@
+
 # General
-.vscode
+# Nix
+# Node
+# Rust
+# Tests and benchmarks
+**/*.rs.bk
+*.log
+.DS_Store
+.direnv/node_modules/
 .idea
+.qa/
+.vscode
+/result
+/target
 _things
 desktop.ini
-.DS_Store
-
-# Tests and benchmarks
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+node_modules
+package-lock.json
+tarpaulin-report.html
+tests/fuzz/artifacts
+tests/fuzz/corpus
+tests/fuzz/coverage
+tests/fuzz/target
 tests/store
 tests/suite/**/*.pdf
-tests/fuzz/target
-tests/fuzz/corpus
-tests/fuzz/artifacts
-tests/fuzz/coverage
-tarpaulin-report.html
-
-# Rust
-/target
-**/*.rs.bk
-
-# Node
-node_modules
 tools/test-helper/dist
-package-lock.json
 
-# Nix
-/result
-.direnv/
+# VitePress 站点
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+.qa/
+*.log

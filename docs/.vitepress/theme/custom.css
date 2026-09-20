@@ -1,0 +1,79 @@
+/**
+ * 考公笔记 · 最小定制
+ * 保持 VitePress 默认的文档风格，只做两件事：
+ *   1. 品牌色换成朱红（贴合考公语境）
+ *   2. 首页倒计时卡片样式
+ */
+
+:root {
+  --vp-c-brand-1: #c0392b;
+  --vp-c-brand-2: #a3242e;
+  --vp-c-brand-3: #8c1f28;
+  --vp-c-brand-soft: rgba(192, 57, 43, 0.14);
+
+  --vp-c-tip-1: #c0392b;
+  --vp-c-tip-soft: rgba(192, 57, 43, 0.14);
+}
+
+.dark {
+  --vp-c-brand-1: #e05a63;
+  --vp-c-brand-2: #ef7a86;
+  --vp-c-brand-3: #f2949e;
+  --vp-c-brand-soft: rgba(224, 90, 99, 0.16);
+
+  --vp-c-tip-1: #e05a63;
+  --vp-c-tip-soft: rgba(224, 90, 99, 0.16);
+}
+
+/* 首页倒计时 */
+.gk-home {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 0 24px 64px;
+}
+
+.gk-cd {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background: var(--vp-c-bg-soft);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.gk-cd .lbl {
+  font-size: 14px;
+  color: var(--vp-c-text-2);
+}
+
+.gk-cd .num {
+  margin: 10px 0 6px;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--vp-c-brand-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.gk-cd .num small {
+  margin-left: 4px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+}
+
+.gk-cd .note {
+  font-size: 13px;
+  color: var(--vp-c-text-3);
+}
+
+/* 表格在窄屏可横向滚动，避免挤压 */
+.vp-doc table {
+  display: block;
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .gk-cd .num {
+    font-size: 36px;
+  }
+}
